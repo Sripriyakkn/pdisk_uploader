@@ -7,11 +7,11 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
-API_ID = environ.get('API_ID', '6')
-API_HASH = environ.get('API_HASH', 'eb06d4abfb49dc3eeb1aeb98ae0f581e')
+API_ID = environ.get('API_ID')
+API_HASH = environ.get('API_HASH')
 BOT_TOKEN = environ.get('BOT_TOKEN')
 PDISK_API_KEY = environ.get('PDISK_API_KEY')
-CHANNEL = environ.get('CHANNEL', '')
+CHANNEL = environ.get('CHANNEL')
 bot = Client('pdisk bot',
              api_id=API_ID,
              api_hash=API_HASH,
@@ -23,9 +23,9 @@ bot = Client('pdisk bot',
 @bot.on_message(filters.command('start') & filters.private)
 async def start(bot, message):
     await message.reply(
-        f"**Hiya 👋{message.chat.first_name}!**\n\n"
-        "**A Simple PDisk Uploader Bot.\n\n➠ Send Me Any Direct Link, YouTube Link Or Video Link  I Will Upload To PDisk And Give Direct Link\n\nMade With❤")
-        
+        f"**𝗛𝗘𝗟𝗟𝗢🎈{message.chat.first_name}!**\n\n"
+        "𝐈'𝐦 𝐚 𝐏𝐝𝐢𝐬𝐤 𝐔𝐩𝐥𝐨𝐚𝐝𝐞𝐫 𝐛𝐨𝐭. 𝐉𝐮𝐬𝐭 𝐬𝐞𝐧𝐝 𝐦𝐞 𝐥𝐢𝐧𝐤, 𝐟𝐢𝐥𝐞 𝐨𝐫 𝐅𝐮𝐥𝐥 𝐩𝐨𝐬𝐭...\𝐧\𝐧 𝐓𝐡𝐢𝐬 𝐛𝐨𝐭 𝐢𝐬 edited 𝐛𝐲 @jack_sparow119")
+
 
 @bot.on_message(filters.text & filters.private)
 async def pdisk_uploader(bot, message):
@@ -75,7 +75,6 @@ async def get_ptitle(url):
     v_id = video_id[0]
     v_len = len(v_id)
     v_id = v_id[1:v_len - 2]
-
     v_url = 'https://www.pdisks.com/share-video?videoid=' + v_id
     res = [str, v_url]
     return res
@@ -91,7 +90,7 @@ async def pdisk_up(link):
         title_new = os.path.basename(title_new.path)
         title_pdisk = '@' + CHANNEL + title_new
     res = requests.get(
-        'http://linkapi.net/open/create_item?link_type=link&content_src=' + link + '&source=2000&api_key=' + PDISK_API_KEY + '&dir_id=0&title=' + title_pdisk +)
+        'http://linkapi.net/open/create_item?link_type=link&content_src=' + link + '&source=2000&api_key=' + PDISK_API_KEY + '&dir_id=0&title=' + title_pdisk + '&description=Join_' + CHANNEL + '_for_more_like_this')
     data = res.json()
     data = dict(data)
     print(data)
@@ -105,8 +104,10 @@ async def multi_pdisk_up(ml_string):
     new_ml_string = await remove_username(new_ml_string)
     new_join_str = "".join(new_ml_string)
 
-    urls = re.findall(r'(https?://[^\s]+)', new_join_str)
-
+    urls = re.findall("(?P<url>https?://[^\s]+)", new_join_str)
+    for i in range(len(url)):
+        requests.get(url[i])
+    
     nml_len = len(new_ml_string)
     u_len = len(urls)
     url_index = []
@@ -144,8 +145,8 @@ async def remove_username(new_List):
 async def addFooter(str):
     footer = """
 ━━━━━━━━━━━━━━━
-⦿ Made With♥️
-━━━━━━━━━━━━━━━
+━━━━
+⭐️JOIN CHANNEL ➡️ t.me/""" + CHANNEL
     return str + footer
 
 bot.run()
