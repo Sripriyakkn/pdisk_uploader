@@ -1,5 +1,6 @@
 from os import environ
 import os
+import time
 from urllib.parse import urlparse
 import aiohttp
 from pyrogram import Client, filters
@@ -7,11 +8,13 @@ import requests
 from bs4 import BeautifulSoup
 import re
 
-API_ID = environ.get('API_ID')
-API_HASH = environ.get('API_HASH')
+API_ID = environ.get('API_ID', '6')
+API_HASH = environ.get('API_HASH', 'eb06d4abfb49dc3eeb1aeb98ae0f581e')
 BOT_TOKEN = environ.get('BOT_TOKEN')
 PDISK_API_KEY = environ.get('PDISK_API_KEY')
-CHANNEL = environ.get('CHANNEL')
+CHANNEL = environ.get('CHANNEL', 'ReZze Hubz')
+THUMB_URL = environ.get('THUMB_URL', '')
+
 bot = Client('pdisk bot',
              api_id=API_ID,
              api_hash=API_HASH,
@@ -23,10 +26,10 @@ bot = Client('pdisk bot',
 @bot.on_message(filters.command('start') & filters.private)
 async def start(bot, message):
     await message.reply(
-        f"**𝗛𝗘𝗟𝗟𝗢🎈{message.chat.first_name}!**\n\n"
-        "𝐈'𝐦 𝐚 𝐏𝐝𝐢𝐬𝐤 𝐔𝐩𝐥𝐨𝐚𝐝𝐞𝐫 𝐛𝐨𝐭. 𝐉𝐮𝐬𝐭 𝐬𝐞𝐧𝐝 𝐦𝐞 𝐥𝐢𝐧𝐤, 𝐟𝐢𝐥𝐞 𝐨𝐫 𝐅𝐮𝐥𝐥 𝐩𝐨𝐬𝐭...\𝐧\𝐧 𝐓𝐡𝐢𝐬 𝐛𝐨𝐭 𝐢𝐬 edited 𝐛𝐲 @jack_sparow119")
+        f"**Hiya 👋{message.chat.first_name}!**\n\n"
+        "**A Simple PDisk Uploader Bot.\n\n➠ Send Me Any Direct Link, YouTube Link Or Video Link  I Will Upload To PDisk And Give Direct Link\n\nMade With❤**")
 
-
+    
 @bot.on_message(filters.text & filters.private)
 async def pdisk_uploader(bot, message):
     new_string = str(message.text)
@@ -35,7 +38,6 @@ async def pdisk_uploader(bot, message):
         await message.reply(f'{pdisk_link}', quote=True)
     except Exception as e:
         await message.reply(f'Error: {e}', quote=True)
-
 
 @bot.on_message(filters.photo & filters.private)
 async def pdisk_uploader(bot, message):
@@ -75,13 +77,14 @@ async def get_ptitle(url):
     v_id = video_id[0]
     v_len = len(v_id)
     v_id = v_id[1:v_len - 2]
-    v_url = 'https://www.pdisks.com/share-video?videoid=' + v_id
+
+    v_url = 'https://www.pdisks.me/share-video?videoid=' + v_id
     res = [str, v_url]
     return res
 
 
 async def pdisk_up(link):
-    if ('pdisk' in link or 'kuklink' in link or 'kofilink' in link or 'cofilink' in link or 'bit' in link):
+    if ('pdisk' in link or 'kuklink' in link or 'kofilink' in link or 'cofilink' in link or 'bit' in link or link in 'vdshort' or link in 'vidrivers'):
         res = await get_ptitle(link)
         title_pdisk = res[0]
         link = res[1]
@@ -90,12 +93,12 @@ async def pdisk_up(link):
         title_new = os.path.basename(title_new.path)
         title_pdisk = '@' + CHANNEL + title_new
     res = requests.get(
-        'http://linkapi.net/open/create_item?link_type=link&content_src=' + link + '&source=2000&api_key=' + PDISK_API_KEY + '&dir_id=0&title=' + title_pdisk + '&description=Join_' + CHANNEL + '_for_more_like_this')
+        'http://linkapi.net/open/create_item?link_type=link&content_src=' + link + '&source=2000&cover_url='+THUMB_URL+'&api_key=' + PDISK_API_KEY + '&dir_id=0&title=' + title_pdisk + '&description=Join_@ReZze_Hubz_' + 'CHANNEL' + '_and_support_us')
     data = res.json()
     data = dict(data)
     print(data)
     v_id = data['data']['item_id']
-    v_url = 'https://www.pdisks.com/share-video?videoid=' + v_id
+    v_url = 'https://www.pdisks.me/share-video?videoid=' + v_id
     return (v_url)
 
 
@@ -104,10 +107,8 @@ async def multi_pdisk_up(ml_string):
     new_ml_string = await remove_username(new_ml_string)
     new_join_str = "".join(new_ml_string)
 
-    urls = re.findall("(?P<url>https?://[^\s]+)", new_join_str)
-    for i in range(len(url)):
-        requests.get(url[i])
-    
+    urls = re.findall(r'(https?://[^\s]+)', new_join_str)
+
     nml_len = len(new_ml_string)
     u_len = len(urls)
     url_index = []
@@ -131,6 +132,7 @@ async def multi_pdisk_up(ml_string):
 async def new_pdisk_url(urls):
     new_urls = []
     for i in urls:
+        time.sleep(0.3)
         new_urls.append(await pdisk_up(i))
     return new_urls
 
@@ -144,9 +146,13 @@ async def remove_username(new_List):
 
 async def addFooter(str):
     footer = """
+    
+<b> Note : Your Video File is Available on Above LINK ones Upload Process is Complete, it Take Time Depend on Your File Size & My Server Upload Speed
+So,be Patient </b>  😴😴😴😴     
 ━━━━━━━━━━━━━━━
-━━━━
-⭐️JOIN CHANNEL ➡️ t.me/""" + CHANNEL
+⦿ Made With♥️
+━━━━━━━━━━━━━━━
+✪ »JOIN CHANNEL ➡️ t.me/""" + CHANNEL
     return str + footer
 
 bot.run()
